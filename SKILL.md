@@ -146,7 +146,7 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 3. 讲稿即旁白：视频旁白必须与 `FEYNMAN.md` 一致，不另写一套更“像视频”的文案。改文案 = 回费曼循环。
 4. 时长服从复杂度：不为凑时长加废话，不为缩时长砍关键步骤。
 5. 画面服从讲稿：画面只解释讲稿讲的东西，不新增知识点。
-6. 平台中立：本 skill 是纯流程 Markdown，可移植到支持 Markdown 指令的任何环境。视频合成优先用环境自带能力（ffmpeg / 平台视频生成），无能力时输出待剪辑包，不谎称已生成。手绘模式同理：无生图 / 描线 / 手臂合成能力时，输出手绘待制作包，不谎称已生成手绘成片。
+6. 平台中立：本 skill 的流程部分是纯 Markdown，可移植到支持 Markdown 指令的任何环境；手绘引擎随仓库收录在 `vendor/`。视频合成优先用环境自带能力（ffmpeg / 平台视频生成），无能力时输出待剪辑包，不谎称已生成。手绘模式同理：无生图 / 描线 / 手臂合成能力时，输出手绘待制作包，不谎称已生成手绘成片。
 7. 字幕唯一性：同一句旁白在同一时刻只保留一份字幕，不多层叠加。
 7. 回复一律中文。视频旁白默认中文，用户另有要求时除外。
 8. 隐私与版权：用户提供的私有材料不外传；引用他人视频/图片需注明来源与许可，未获许可不直接复用。
@@ -165,8 +165,8 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 ## 归属与许可
 
 - 本 skill 的教学工作区结构（使命 / 资源 / 课程 / 学习记录 / 参考文档）与“不信任参数记忆、重视检索与间隔”等理念，源自 Matt Pocock 的 `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。本 skill 在其基础上做了原创改动：费曼四步门禁、卡点日志、讲稿即旁白、视频生成管线、时长决策表、检索+间隔复习。
-- 手绘模式的制作思路参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，Copyright (c) 2026 threerocks；吸纳时版本 1.2.3）。本 skill 没有复制其代码与素材，只吸收了可复用的流程要点（声音先行、绘制计划、分部位描线、字幕唯一性、代表段检查），并按费曼教学重新组织。上游更新跟踪见 `references/upstream-tracking.md`。
-- 本 skill 本身 MIT，见 LICENSE。引用 `teach` 时保留其 MIT 声明。
+- 手绘模式的制作思路参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，Copyright (c) 2026 threerocks；吸纳时版本 1.2.3）。流程要点（声音先行、绘制计划、分部位描线、字幕唯一性、代表段检查）按费曼教学重新组织。其完整源码作为上游快照原样收录在 `vendor/sweety-handdraw-video/`（保留上游 LICENSE 与 THIRD_PARTY_NOTICES，不做修改），手绘模式运行时调用其中的 `handdraw_video.py`；每周由 GitHub Actions 自动同步上游，冒烟测试通过才更新。详见 `vendor/README.md` 与 `references/upstream-tracking.md`。
+- 本 skill 本身 MIT，见 LICENSE。引用 `teach` 时保留其 MIT 声明；`vendor/` 下的第三方代码按其各自许可证。
 
 ## 出品：刘洪光
 

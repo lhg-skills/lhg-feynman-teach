@@ -1,5 +1,5 @@
 slug: lhg-feynman-teach
 display_name: 费曼教学
 description: 费曼学习法 + 有状态教学 + 视频输出：输入一个想学的东西，先用费曼四步讲通，再输出学习结论与教学视频（默认 3 分钟，幻灯片/手绘双视觉模式）。
-version: 1.1.1
+version: 1.2.0
 author: 刘洪光

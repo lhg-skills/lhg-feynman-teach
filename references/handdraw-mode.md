@@ -52,4 +52,4 @@
 
 ## 来源与归属
 
-手绘模式的制作思路参考 `threerocks/sweety-handdraw-video`（MIT，见 `references/upstream-tracking.md`）。本 skill 没有复制其代码与素材，只吸收了可复用的流程要点（声音先行、绘制计划、分部位描线、字幕唯一性、代表段检查），并按费曼教学的“讲稿即旁白、画面服从讲稿”重新组织。上游的完整实现、脚本与素材以其仓库为准。
+手绘模式的制作思路参考 `threerocks/sweety-handdraw-video`（MIT，见 `references/upstream-tracking.md`）。可复用的流程要点（声音先行、绘制计划、分部位描线、字幕唯一性、代表段检查）按费曼教学的“讲稿即旁白、画面服从讲稿”重新组织。上游完整源码原样收录在 `vendor/sweety-handdraw-video/`（MIT，保留原许可证，不手改），引擎入口 `vendor/sweety-handdraw-video/skills/sweety-handdraw-video/scripts/handdraw_video.py`，每周自动同步上游，见 `vendor/README.md`。

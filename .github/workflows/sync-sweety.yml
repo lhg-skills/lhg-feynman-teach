@@ -1,0 +1,147 @@
+name: Sync vendored sweety-handdraw-video
+
+# 每周一 09:00（北京时间）自动拉取上游 threerocks/sweety-handdraw-video，
+# 同步到 vendor/sweety-handdraw-video/，冒烟测试全部通过才直接提交到 main；
+# 任一测试失败则不提交，并开 issue 通知。
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: '上游 commit / tag / 分支（留空 = 上游默认分支最新）'
+        required: false
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'vendor/sweety-handdraw-video.pin'
+      - '.github/workflows/sync-sweety.yml'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sync-sweety
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_URL: https://github.com/threerocks/sweety-handdraw-video.git
+  VENDOR_DIR: vendor/sweety-handdraw-video
+  PIN_FILE: vendor/sweety-handdraw-video.pin
+  MARKER: vendor/sweety-handdraw-video/.upstream-commit
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Resolve target upstream commit
+        id: target
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
+        run: |
+          set -euo pipefail
+          git clone --quiet "$UPSTREAM_URL" /tmp/upstream
+          if [ "$EVENT" = "push" ]; then
+            # 手动改 pin 文件 = 锁定到指定版本（首次导入也走这里）
+            REF="$(tr -d '[:space:]' < "$PIN_FILE")"
+          elif [ -n "$INPUT_REF" ]; then
+            REF="$INPUT_REF"
+          else
+            REF="origin/HEAD"
+          fi
+          TARGET="$(git -C /tmp/upstream rev-parse "${REF}^{commit}")"
+          CURRENT="$(cat "$MARKER" 2>/dev/null || echo none)"
+          echo "target=$TARGET"   >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          if [ "$TARGET" = "$CURRENT" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "已是最新：$TARGET，无需同步。"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "将同步：$CURRENT -> $TARGET"
+          fi
+
+      - name: Copy upstream into vendor/
+        if: steps.target.outputs.skip == 'false'
+        env:
+          TARGET: ${{ steps.target.outputs.target }}
+        run: |
+          set -euo pipefail
+          git -C /tmp/upstream checkout --quiet "$TARGET"
+          mkdir -p "$VENDOR_DIR"
+          # 完整复制（含上游 LICENSE / THIRD_PARTY_NOTICES），不带 .git 和上游自己的 CI
+          rsync -a --delete --exclude '.git/' --exclude '.github/' --exclude '.upstream-commit' \
+            /tmp/upstream/ "$VENDOR_DIR/"
+          echo "$TARGET" > "$MARKER"
+
+      - uses: actions/setup-python@v5
+        if: steps.target.outputs.skip == 'false'
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies
+        if: steps.target.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install -q -r "$VENDOR_DIR/skills/sweety-handdraw-video/scripts/requirements.txt" fonttools
+
+      - name: Smoke test (validate + unit tests + offline pipeline)
+        if: steps.target.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          S="$VENDOR_DIR/skills/sweety-handdraw-video/scripts"
+          python "$S/validate_package.py"
+          python -m unittest discover -s "$S" -p 'test*.py'
+          python "$S/smoke_test.py" --output /tmp/sweety-smoke | tee /tmp/smoke.log
+          grep -q 'offline_runtime_checks_passed' /tmp/smoke.log
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 /tmp/sweety-smoke/outputs/film.mp4
+
+      - name: Commit to main (auto-merge after smoke test passed)
+        if: steps.target.outputs.skip == 'false'
+        env:
+          TARGET: ${{ steps.target.outputs.target }}
+          CURRENT: ${{ steps.target.outputs.current }}
+        run: |
+          set -euo pipefail
+          VERSION="$(cat "$VENDOR_DIR/skills/sweety-handdraw-video/VERSION" 2>/dev/null || echo unknown)"
+          echo "$TARGET" > "$PIN_FILE"
+          {
+            echo "# 上游快照记录"
+            echo
+            echo "- 上游：https://github.com/threerocks/sweety-handdraw-video（MIT，许可证见本目录 LICENSE）"
+            echo "- 当前版本：VERSION $VERSION，commit \`$TARGET\`"
+            echo "- 同步时间：$(date -u '+%Y-%m-%d %H:%M UTC')（GitHub Actions 自动同步，冒烟测试已通过）"
+            echo
+            echo "## 本次上游变更"
+            echo
+            if [ "$CURRENT" != "none" ] && git -C /tmp/upstream merge-base --is-ancestor "$CURRENT" "$TARGET" 2>/dev/null; then
+              git -C /tmp/upstream log --no-merges --format='- %h %s' "$CURRENT..$TARGET"
+            else
+              echo "- 首次导入或版本跳转（上一版：$CURRENT）"
+            fi
+          } > vendor/UPSTREAM.md
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A vendor/
+          if git diff --cached --quiet; then echo "无文件变化"; exit 0; fi
+          git commit -q -m "chore(vendor): sync sweety-handdraw-video to ${TARGET:0:7} (v$VERSION)"
+          git push origin HEAD:main
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.target.outputs.target }}
+        run: |
+          TITLE="上游 sweety 同步失败：${TARGET:0:7}"
+          if [ -z "$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[].number')" ]; then
+            gh issue create --title "$TITLE" --body "冒烟测试或同步未通过，本次未提交，vendor/ 保持上一版。日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
