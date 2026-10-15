@@ -1,0 +1,166 @@
+name: Sync vendored upstreams
+
+# 每周一 09:00（北京时间）同步两个上游到 vendor/：
+#   - threerocks/sweety-handdraw-video（手绘引擎，整仓）
+#   - mattpocock/skills 的 skills/productivity/teach（教学底座，附仓库根 LICENSE）
+# 检查全部通过才直接提交到 main：sweety 自检 + 单元测试 + smoke_test、teach 结构检查、
+# 本仓库样片 examples/ai-learn-30s 完整回归。任一失败不提交，开 issue。
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+    inputs:
+      sweety_ref:
+        description: 'sweety 上游 commit/tag（留空 = 最新）'
+        required: false
+        default: ''
+      teach_ref:
+        description: 'mattpocock/skills 上游 commit（留空 = 最新）'
+        required: false
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'vendor/*.pin'
+      - '.github/workflows/sync-vendor.yml'
+      - 'examples/**'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sync-vendor
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve and copy upstreams
+        id: sync
+        env:
+          EVENT: ${{ github.event_name }}
+          SWEETY_REF: ${{ github.event.inputs.sweety_ref }}
+          TEACH_REF: ${{ github.event.inputs.teach_ref }}
+        run: |
+          set -euo pipefail
+          resolve() { # name url pinfile inputref
+            local name=$1 url=$2 pin=$3 input=$4 ref
+            git clone --quiet "$url" "/tmp/up-$name"
+            if [ "$EVENT" = "push" ]; then ref="$(tr -d '[:space:]' < "$pin")"
+            elif [ -n "$input" ]; then ref="$input"
+            else ref="origin/HEAD"; fi
+            git -C "/tmp/up-$name" rev-parse "${ref}^{commit}"
+          }
+          SW=$(resolve sweety https://github.com/threerocks/sweety-handdraw-video.git vendor/sweety-handdraw-video.pin "$SWEETY_REF")
+          TE=$(resolve teach  https://github.com/mattpocock/skills.git               vendor/teach.pin               "$TEACH_REF")
+          SW_CUR=$(cat vendor/sweety-handdraw-video/.upstream-commit 2>/dev/null || echo none)
+          TE_CUR=$(cat vendor/teach/.upstream-commit 2>/dev/null || echo none)
+          CHANGED=false
+          if [ "$SW" != "$SW_CUR" ]; then
+            CHANGED=true; git -C /tmp/up-sweety checkout --quiet "$SW"
+            mkdir -p vendor/sweety-handdraw-video
+            rsync -a --delete --exclude '.git/' --exclude '.github/' --exclude '.upstream-commit' /tmp/up-sweety/ vendor/sweety-handdraw-video/
+            echo "$SW" > vendor/sweety-handdraw-video/.upstream-commit
+          fi
+          if [ "$TE" != "$TE_CUR" ]; then
+            CHANGED=true; git -C /tmp/up-teach checkout --quiet "$TE"
+            mkdir -p vendor/teach
+            rsync -a --delete --exclude '.upstream-commit' --exclude 'LICENSE' /tmp/up-teach/skills/productivity/teach/ vendor/teach/
+            cp /tmp/up-teach/LICENSE vendor/teach/LICENSE
+            echo "$TE" > vendor/teach/.upstream-commit
+          fi
+          { echo "sweety=$SW"; echo "sweety_cur=$SW_CUR"; echo "teach=$TE"; echo "teach_cur=$TE_CUR"; echo "changed=$CHANGED"; } >> "$GITHUB_OUTPUT"
+          echo "sweety: $SW_CUR -> $SW"; echo "teach: $TE_CUR -> $TE"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies and fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install -q -r vendor/sweety-handdraw-video/skills/sweety-handdraw-video/scripts/requirements.txt fonttools
+          mkdir -p /tmp/fonts
+          curl -fsSL -o /tmp/fonts/MaShanZheng-Regular.ttf https://github.com/google/fonts/raw/main/ofl/mashanzheng/MaShanZheng-Regular.ttf
+
+      - name: Check sweety (validate + unit tests + smoke test)
+        run: |
+          set -euo pipefail
+          S=vendor/sweety-handdraw-video/skills/sweety-handdraw-video/scripts
+          python "$S/validate_package.py"
+          python -m unittest discover -s "$S" -p 'test*.py'
+          python "$S/smoke_test.py" --output /tmp/sweety-smoke | tee /tmp/smoke.log
+          grep -q 'offline_runtime_checks_passed' /tmp/smoke.log
+
+      - name: Check teach (files this skill depends on still exist)
+        run: |
+          set -euo pipefail
+          for f in SKILL.md LICENSE MISSION-FORMAT.md RESOURCES-FORMAT.md LEARNING-RECORD-FORMAT.md GLOSSARY-FORMAT.md; do
+            test -s "vendor/teach/$f" || { echo "missing vendor/teach/$f"; exit 1; }
+          done
+          # 本 skill 引用的 vendor/teach 路径必须全部存在
+          grep -ohE 'vendor/teach/[A-Za-z0-9._/-]+\.md' SKILL.md references/*.md | sort -u | while read -r p; do
+            test -s "$p" || { echo "SKILL 引用了不存在的 $p"; exit 1; }
+          done
+
+      - name: Regression - render examples/ai-learn-30s
+        env:
+          HW_FONT: /tmp/fonts/MaShanZheng-Regular.ttf
+          SC_FONT: /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+          SC_INDEX: '2'
+        run: bash examples/ai-learn-30s/run.sh
+
+      - name: Commit to main (all checks passed)
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          SW: ${{ steps.sync.outputs.sweety }}
+          SW_CUR: ${{ steps.sync.outputs.sweety_cur }}
+          TE: ${{ steps.sync.outputs.teach }}
+          TE_CUR: ${{ steps.sync.outputs.teach_cur }}
+        run: |
+          set -euo pipefail
+          VERSION="$(cat vendor/sweety-handdraw-video/skills/sweety-handdraw-video/VERSION 2>/dev/null || echo unknown)"
+          echo "$SW" > vendor/sweety-handdraw-video.pin
+          echo "$TE" > vendor/teach.pin
+          changes() { # repo cur new [path]
+            if [ "$2" != "none" ] && git -C "$1" merge-base --is-ancestor "$2" "$3" 2>/dev/null; then
+              git -C "$1" log --no-merges --format='- %h %s' "$2..$3" -- ${4:-.} | head -50
+            else echo "- 首次导入或版本跳转（上一版：$2）"; fi
+          }
+          {
+            echo "# 上游快照记录"
+            echo
+            echo "同步时间：$(date -u '+%Y-%m-%d %H:%M UTC')（GitHub Actions 自动同步，全部检查通过）"
+            echo
+            echo "## sweety-handdraw-video"
+            echo "- 来源：https://github.com/threerocks/sweety-handdraw-video（MIT，见 vendor/sweety-handdraw-video/LICENSE）"
+            echo "- 版本：VERSION $VERSION，commit \`$SW\`"
+            echo; changes /tmp/up-sweety "$SW_CUR" "$SW"; echo
+            echo "## teach"
+            echo "- 来源：https://github.com/mattpocock/skills/tree/main/skills/productivity/teach（MIT，见 vendor/teach/LICENSE）"
+            echo "- 版本：commit \`$TE\`"
+            echo; changes /tmp/up-teach "$TE_CUR" "$TE" skills/productivity/teach
+          } > vendor/UPSTREAM.md
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A vendor/
+          if git diff --cached --quiet; then echo "无文件变化"; exit 0; fi
+          git commit -q -m "chore(vendor): sync sweety ${SW:0:7} (v$VERSION) + teach ${TE:0:7}"
+          git push origin HEAD:main
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SW: ${{ steps.sync.outputs.sweety }}
+          TE: ${{ steps.sync.outputs.teach }}
+        run: |
+          TITLE="上游同步失败：sweety ${SW:0:7} / teach ${TE:0:7}"
+          if [ -z "$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[].number')" ]; then
+            gh issue create --title "$TITLE" --body "检查未通过，本次未提交，vendor/ 保持上一版。日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
