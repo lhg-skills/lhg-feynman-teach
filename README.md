@@ -32,7 +32,7 @@ Input one thing you want to learn. It first forces the explanation through the F
 
 ### Base + attribution
 
-Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT). Hand-drawn mode references `threerocks/sweety-handdraw-video` (https://github.com/threerocks/sweety-handdraw-video, MIT, v1.2.3 at integration) for workflow ideas; its full source is vendored unmodified under `vendor/sweety-handdraw-video/` (original MIT license kept) and synced weekly from upstream by GitHub Actions (auto-committed only after the smoke test passes). This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, retrieval + spacing.
+Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT); its source is vendored unmodified under `vendor/teach/` and its format files are referenced directly. Hand-drawn mode references `threerocks/sweety-handdraw-video` (https://github.com/threerocks/sweety-handdraw-video, MIT, v1.2.3 at integration) for workflow ideas; its full source is vendored unmodified under `vendor/sweety-handdraw-video/` (original MIT license kept) and synced weekly from upstream by GitHub Actions (auto-committed only after the smoke test passes). This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, retrieval + spacing.
 
 ### License
 
@@ -68,7 +68,7 @@ MIT — see [LICENSE](LICENSE).
 
 ### 底座与归属
 
-教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。手绘模式参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，吸纳时 v1.2.3），流程要点按费曼教学重新组织；其完整源码原样收录在 `vendor/sweety-handdraw-video/`（保留原 MIT 许可证，不手改），由 GitHub Actions 每周自动同步上游，冒烟测试通过才更新。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、检索+间隔复习。
+教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT），源码原样收录在 `vendor/teach/`，本 skill 直接引用其格式文件。手绘模式参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，吸纳时 v1.2.3），流程要点按费曼教学重新组织；其完整源码原样收录在 `vendor/sweety-handdraw-video/`（保留原 MIT 许可证，不手改），由 GitHub Actions 每周自动同步上游，冒烟测试通过才更新。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、检索+间隔复习。
 
 ### License
 

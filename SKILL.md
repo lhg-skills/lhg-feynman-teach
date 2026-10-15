@@ -36,6 +36,7 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 
 先问清：为什么学？学完要能做什么？给谁讲？
 
+- 格式与规则以 `vendor/teach/MISSION-FORMAT.md` 为准（随上游自动更新）。
 - 使命必须具体可观察，例如“能给团队讲清 Rust 所有权，三分钟不卡壳”，而不是“了解 Rust”。
 - 使命不清不往下走。先访谈，直到能写出 `MISSION.md`（为什么 / 成功长什么样 / 约束 / 不做范围）。
 - 使命变了就更新，并记一条学习记录。
@@ -44,6 +45,7 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 
 不信任模型参数记忆。先找高可信资源，再教。
 
+- 格式与规则以 `vendor/teach/RESOURCES-FORMAT.md` 为准（分 Knowledge / Wisdom，每条注明用途）。
 - 优先一手来源：官方文档、原论文、经典教材、作者本人讲解、高信誉社区的精华帖。
 - 每个资源写一行：覆盖什么、什么时候用。裸链接不收。
 - 找不到好资源的领域，写 `## Gaps`，明确缺什么，不编造。
@@ -82,7 +84,8 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 
 - `FEYNMAN.md`：本单元的最终大白话讲稿（即视频旁白底稿）。
 - `GAP-LOG.md`：卡点与补漏记录（学到了什么、原来哪里不懂）。
-- `learning-records/000N-<单元>.md`：学到的关键洞察、易错点、下次复习点。
+- `learning-records/000N-<单元>.md`：格式与写入门槛以 `vendor/teach/LEARNING-RECORD-FORMAT.md` 为准——只有用户拿出了真正掌握的证据才写，“讲过”不等于“学会”。
+- `GLOSSARY.md`：本主题的统一术语表，格式以 `vendor/teach/GLOSSARY-FORMAT.md` 为准；用户真正会用了才收录，之后讲稿与视频一律用表内术语。
 - `reference/*.md`：压缩版速查表（定义、公式/步骤、易错清单、术语人话对照表）。
 - `NOTES.md`：用户偏好（讲课风格、语速、例子偏好）。
 
@@ -133,7 +136,7 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 2. `RESOURCES.md`（可信资源 + 来源标注）
 3. `FEYNMAN.md`（通过门禁的大白话讲稿 = 视频旁白底稿）
 4. `GAP-LOG.md`（卡点与补漏）
-5. `learning-records/`（学习记录）
+5. `learning-records/`（学习记录）+ `GLOSSARY.md`（术语表）
 6. `reference/`（速查表 + 术语人话对照）
 7. `video/`：`script.md`（旁白 + 视觉模式选择理由）、`storyboard.md`（分镜）、`video.mp4`（成片；无合成工具时为“待剪辑包”+ 说明；手绘模式无能力时为手绘待制作包）、`subtitles.srt`；手绘模式另附 `drawing-plan.json`（绘制计划）
 8. `quiz.md`（自测题）+ `review-plan.md`（间隔复习计划）
@@ -164,7 +167,7 @@ description: "费曼学习法 + 有状态教学 + 视频输出：输入一个想
 
 ## 归属与许可
 
-- 本 skill 的教学工作区结构（使命 / 资源 / 课程 / 学习记录 / 参考文档）与“不信任参数记忆、重视检索与间隔”等理念，源自 Matt Pocock 的 `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。本 skill 在其基础上做了原创改动：费曼四步门禁、卡点日志、讲稿即旁白、视频生成管线、时长决策表、检索+间隔复习。
+- 本 skill 的教学工作区结构（使命 / 资源 / 课程 / 学习记录 / 术语表 / 参考文档）与“不信任参数记忆、重视检索与间隔”等理念，源自 Matt Pocock 的 `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。其源码原样收录在 `vendor/teach/`（附上游 LICENSE，不手改），本 skill 直接引用其中的 4 个格式文件，每周自动同步上游。本 skill 在其基础上做了原创改动：费曼四步门禁、卡点日志、讲稿即旁白、视频生成管线、时长决策表、检索+间隔复习。
 - 手绘模式的制作思路参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，Copyright (c) 2026 threerocks；吸纳时版本 1.2.3）。流程要点（声音先行、绘制计划、分部位描线、字幕唯一性、代表段检查）按费曼教学重新组织。其完整源码作为上游快照原样收录在 `vendor/sweety-handdraw-video/`（保留上游 LICENSE 与 THIRD_PARTY_NOTICES，不做修改），手绘模式运行时调用其中的 `handdraw_video.py`；每周由 GitHub Actions 自动同步上游，冒烟测试通过才更新。详见 `vendor/README.md` 与 `references/upstream-tracking.md`。
 - 本 skill 本身 MIT，见 LICENSE。引用 `teach` 时保留其 MIT 声明；`vendor/` 下的第三方代码按其各自许可证。
 
