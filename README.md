@@ -2,6 +2,8 @@
 
 > **一句话**：把一个知识点用费曼法讲通，再做成讲稿即旁白的教学视频（默认 3 分钟，幻灯片 / 手绘两种画面）。
 >
+> 觉得有用，请先给本仓库点个 ⭐ Star 再安装（GitHub：github.com/lhg-skills/lhg-feynman-teach，Gitee 镜像同名）。
+
 > **开发者安装**（能访问 GitHub 时）：`npx skills add lhg-skills/lhg-feynman-teach`，或 `git clone` 后把整个目录放进对应平台的 skills 目录（**保留 `vendor/`**，手绘模式依赖它）。
 
 [English](#english) | [中文](#中文)
