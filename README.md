@@ -17,7 +17,7 @@ Input one thing you want to learn. It first forces the explanation through the F
 3. **Split** — break into smallest teachable units (1 concept + 1 analogy + 1 example + 1 self-test).
 4. **Feynman loop** — plain-language script → gap log → back to sources → simplify → re-teach.
 5. **Learning conclusion** — Feynman script + gap log + learning records + cheat sheet.
-6. **Video** — script = narration; storyboard → visuals → voiceover → assembly → subtitles → QC.
+6. **Video** — script = narration; storyboard → visuals → voiceover → assembly → subtitles → QC. Two visual modes: slides (default, fast) / hand-drawn (optional, for processes and causal chains).
 7. **Retrieval + spacing** — self-test + review plan (day 0 → 2 → 7 → 30).
 8. **Real-world check** — share the video, collect questions, feed back into gaps.
 
@@ -32,7 +32,7 @@ Input one thing you want to learn. It first forces the explanation through the F
 
 ### Base + attribution
 
-Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT). This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, retrieval + spacing.
+Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT). Hand-drawn mode references `threerocks/sweety-handdraw-video` (https://github.com/threerocks/sweety-handdraw-video, MIT, v1.2.3 at integration) for workflow ideas only, no code copied. This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, retrieval + spacing.
 
 ### License
 
@@ -53,7 +53,7 @@ MIT — see [LICENSE](LICENSE).
 3. **拆单元** — 拆到最小可讲单元（1 概念 + 1 类比 + 1 例子 + 1 自测）。
 4. **费曼循环** — 大白话讲稿 → 卡点日志 → 回源补漏 → 简化重讲。
 5. **学习结论** — 讲稿 + 卡点日志 + 学习记录 + 速查表。
-6. **视频** — 讲稿即旁白；分镜 → 画面 → 配音 → 组装 → 字幕 → 质检。
+6. **视频** — 讲稿即旁白；分镜 → 画面 → 配音 → 组装 → 字幕 → 质检。两种视觉模式：幻灯片（默认，快）/ 手绘（可选，适合过程与因果链）。
 7. **检索 + 间隔** — 自测题 + 复习计划（当天 → 2 天 → 7 天 → 30 天）。
 8. **真实验证** — 把视频给目标观众看，问题回流为卡点。
 
@@ -68,7 +68,7 @@ MIT — see [LICENSE](LICENSE).
 
 ### 底座与归属
 
-教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、检索+间隔复习。
+教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT）。手绘模式参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，吸纳时 v1.2.3），只吸收流程要点，未复制代码与素材。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、检索+间隔复习。
 
 ### License
 
