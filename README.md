@@ -14,25 +14,24 @@ Input one thing you want to learn. It first forces the explanation through the F
 
 1. **Mission** — why learn it, what success looks like.
 2. **Trusted resources** — no parametric trust; every factual claim needs a source.
-3. **Split** — break into smallest teachable units (1 concept + 1 analogy + 1 example + 1 self-test).
+3. **Split** — break into smallest teachable units (1 concept + 1 analogy + 1 example + 1 pitfall).
 4. **Feynman loop** — plain-language script → gap log → back to sources → simplify → re-teach.
 5. **Learning conclusion** — Feynman script + gap log + learning records + cheat sheet.
 6. **Video** — script = narration; storyboard → visuals → voiceover → assembly → subtitles → QC. Two visual modes: slides (default, fast) / hand-drawn (optional, for processes and causal chains).
-7. **Retrieval + spacing** — self-test + review plan (day 0 → 2 → 7 → 30).
-8. **Real-world check** — share the video, collect questions, feed back into gaps.
+7. **Real-world check** — share the video, collect questions, feed back into gaps.
 
 ### Video length
 
 | Length | Use for |
 |---|---|
 | 1 min | 1 single concept, 1 analogy, 1 example |
-| 3 min (default) | 1 complete mini-lesson, 2-3 steps + 1 pitfall + 1 self-test |
+| 3 min (default) | 1 complete mini-lesson, 2-3 steps + 1 pitfall |
 | 5 min | 1 system / chain with dependencies |
 | >5 min | Split into multiple 3-min episodes |
 
 ### Base + attribution
 
-Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT); its source is vendored unmodified under `vendor/teach/` and its format files are referenced directly. Hand-drawn mode references `threerocks/sweety-handdraw-video` (https://github.com/threerocks/sweety-handdraw-video, MIT, v1.2.3 at integration) for workflow ideas; its full source is vendored unmodified under `vendor/sweety-handdraw-video/` (original MIT license kept) and synced weekly from upstream by GitHub Actions (auto-committed only after the smoke test passes). This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, retrieval + spacing.
+Teaching-workspace structure and “no parametric trust” ideas come from Matt Pocock `teach` (https://github.com/mattpocock/skills/tree/main/skills/productivity/teach, MIT); its source is vendored unmodified under `vendor/teach/` and its format files are referenced directly. Hand-drawn mode references `threerocks/sweety-handdraw-video` (https://github.com/threerocks/sweety-handdraw-video, MIT, v1.2.3 at integration) for workflow ideas; its full source is vendored unmodified under `vendor/sweety-handdraw-video/` (original MIT license kept) and synced weekly from upstream by GitHub Actions (auto-committed only after the smoke test passes). This skill adds original work: Feynman gate, gap log, script-as-narration, video pipeline, duration decision table, audience-oriented Feynman loop.
 
 ### License
 
@@ -50,25 +49,24 @@ MIT — see [LICENSE](LICENSE).
 
 1. **定使命** — 为什么学、学完能做什么。
 2. **找可信资源** — 不信任参数记忆，每个事实断言要有来源。
-3. **拆单元** — 拆到最小可讲单元（1 概念 + 1 类比 + 1 例子 + 1 自测）。
+3. **拆单元** — 拆到最小可讲单元（1 概念 + 1 类比 + 1 例子 + 1 易错点）。
 4. **费曼循环** — 大白话讲稿 → 卡点日志 → 回源补漏 → 简化重讲。
 5. **学习结论** — 讲稿 + 卡点日志 + 学习记录 + 速查表。
 6. **视频** — 讲稿即旁白；分镜 → 画面 → 配音 → 组装 → 字幕 → 质检。两种视觉模式：幻灯片（默认，快）/ 手绘（可选，适合过程与因果链）。
-7. **检索 + 间隔** — 自测题 + 复习计划（当天 → 2 天 → 7 天 → 30 天）。
-8. **真实验证** — 把视频给目标观众看，问题回流为卡点。
+7. **真实验证** — 把视频给目标观众看，问题回流为卡点。
 
 ### 视频时长
 
 | 时长 | 适用 |
 |---|---|
 | 1 分钟 | 1 个单一概念、1 个类比、1 个例子 |
-| 3 分钟（默认） | 1 个完整小课：2-3 步 + 1 易错点 + 1 自测 |
+| 3 分钟（默认） | 1 个完整小课：2-3 步 + 1 易错点 |
 | 5 分钟 | 1 个系统/链条，有依赖、需完整推导 |
 | 超过 5 分钟 | 拆成多集 3 分钟 |
 
 ### 底座与归属
 
-教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT），源码原样收录在 `vendor/teach/`，本 skill 直接引用其格式文件。手绘模式参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，吸纳时 v1.2.3），流程要点按费曼教学重新组织；其完整源码原样收录在 `vendor/sweety-handdraw-video/`（保留原 MIT 许可证，不手改），由 GitHub Actions 每周自动同步上游，冒烟测试通过才更新。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、检索+间隔复习。
+教学工作区结构与“不信任参数记忆”等理念源自 Matt Pocock `teach`（https://github.com/mattpocock/skills/tree/main/skills/productivity/teach，MIT），源码原样收录在 `vendor/teach/`，本 skill 直接引用其格式文件。手绘模式参考 `threerocks/sweety-handdraw-video`（https://github.com/threerocks/sweety-handdraw-video，MIT，吸纳时 v1.2.3），流程要点按费曼教学重新组织；其完整源码原样收录在 `vendor/sweety-handdraw-video/`（保留原 MIT 许可证，不手改），由 GitHub Actions 每周自动同步上游，冒烟测试通过才更新。本 skill 在其上做了原创改动：费曼门禁、卡点日志、讲稿即旁白、视频管线、时长决策表、观众导向的费曼循环。
 
 ### License
 
