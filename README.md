@@ -1,6 +1,55 @@
 # lhg-feynman-teach · 费曼教学
 
+> **一句话**：把一个知识点用费曼法讲通，再做成讲稿即旁白的教学视频（默认 3 分钟，幻灯片 / 手绘两种画面）。
+>
+> **开发者安装**（能访问 GitHub 时）：`npx skills add lhg-skills/lhg-feynman-teach`，或 `git clone` 后把整个目录放进对应平台的 skills 目录（**保留 `vendor/`**，手绘模式依赖它）。
+
 [English](#english) | [中文](#中文)
+
+---
+
+## 发给 Agent 的安装话术（推荐）
+
+复制下面整段话，发给你的 Agent（豆包 / WorkBuddy / Claude Code / Codex / Cursor 等）：
+
+> 请帮我安装 Skill「lhg-feynman-teach」：先从 Gitee 上 lhg-skills 组织下的 lhg-feynman-teach 仓库下载；如果 Gitee 无法访问或下载失败，改从 GitHub 上 lhg-skills 组织下的同名仓库下载。按当前 Agent 的规范安装其中的 Skill，优先全局安装，保留完整目录和依赖。请直接执行，完成后验证是否安装成功，告诉我实际使用的来源、安装的版本号以及如何调用；遇到访问或安装限制请说明具体原因。
+
+**怎么算装好了**：Agent 能在已安装的 Skill 里看到 `lhg-feynman-teach`，并报出版本号（与仓库 `manifest.yaml` 的 `version` 一致）；安装目录里有 `vendor/` 和 `references/`。只是打开了仓库网页不算安装。
+
+## 如何调用
+
+直接对 Agent 说：
+
+- “用费曼法给 12 岁孩子讲清楚：为什么天空是蓝色的，做成 1 分钟视频。”
+- “把『大模型为什么会胡说八道』讲通，出一条 3 分钟教学视频，用手绘画面。”
+- “这是我的资料（附文件），帮我讲成小白能听懂的讲稿，先不用出视频。”
+
+## 什么时候用 / 什么时候不用
+
+**用它，当你**：
+- 要把一个概念 / 工具 / 原理讲给外行听，并且要发成视频
+- 想检验自己是不是真懂：讲不通，就说明没学会
+
+**别用它，当你**：
+- 只要一段好看的宣传片或纯剪辑（没有“讲通”的需求）
+- 内容超过 5 分钟又不想拆集
+
+## 常见失败与原因
+
+| 现象 | 原因 | 应对 |
+|---|---|---|
+| 只给了讲稿和分镜，没有视频 | 宿主没有 `ffmpeg` / TTS（降到讲稿档） | 装 `ffmpeg` 与中文 TTS 后重跑第 6 步 |
+| 手绘模式报错或退化成幻灯片 | 只复制了 `SKILL.md`，缺 `vendor/`；或缺 scipy / 手写字体 | 按话术“保留完整目录和依赖”重装；`pip install -r` 上游 requirements |
+| 画面里的中文是方块 | 缺 CJK 字体 | 安装 Noto Sans CJK 等中文字体 |
+| 装到旧版本 | Gitee 镜像未同步 | 让 Agent 报版本号，与 GitHub `manifest.yaml` 对比 |
+
+## 卸载
+
+删除 Agent skills 目录下的 `lhg-feynman-teach` 文件夹即可（或 `npx skills remove lhg-feynman-teach`）。教学工作区里已生成的讲稿和视频不受影响。
+
+## 反馈
+
+提 issue 时请附：Agent 名称、安装来源（Gitee / GitHub）、版本号、报错原文或截图、输入的主题。也可以让 Agent 按 SKILL.md 的“自检与反馈”生成质检报告后一键提交。
 
 ---
 
@@ -78,6 +127,6 @@ MIT — 详见 [LICENSE](LICENSE)。
 
 本 skill 由真人出镜 IP「刘洪光」（安徽合肥）出品，归属 [lhg-skills](https://github.com/lhg-skills)。
 
-- GitHub 主页：https://github.com/lhg-skills
+- GitHub 主页：https://github.com/lhg-skills —— 全部 skill 开源在此，欢迎 star
 - 视频号：搜「刘洪光实名上网」
 - 微信：lhgsmsw
