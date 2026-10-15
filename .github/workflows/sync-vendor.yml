@@ -63,7 +63,7 @@ jobs:
           if [ "$SW" != "$SW_CUR" ]; then
             CHANGED=true; git -C /tmp/up-sweety checkout --quiet "$SW"
             mkdir -p vendor/sweety-handdraw-video
-            rsync -a --delete --exclude '.git/' --exclude '.github/' --exclude '.upstream-commit' /tmp/up-sweety/ vendor/sweety-handdraw-video/
+            rsync -a --delete --exclude '.git/' --exclude '/.github/' --exclude '.upstream-commit' /tmp/up-sweety/ vendor/sweety-handdraw-video/
             echo "$SW" > vendor/sweety-handdraw-video/.upstream-commit
           fi
           if [ "$TE" != "$TE_CUR" ]; then
