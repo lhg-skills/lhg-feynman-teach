@@ -27,3 +27,4 @@
 ## 跟踪日志
 
 - 2026-10-15 / 1.2.3 / 5206ec0d / 首次吸纳 / 新建 `references/handdraw-mode.md`，SKILL.md 升级到 1.1.0，手绘模式作为可选视觉模式
+- 2026-10-15 / 1.2.3 / 5206ec0d / 完整包已下载 / 全量克隆到 ~/workspace/skills/threerocks-sweety-handdraw-video/（1307 文件，约 81M，含 scripts 37 个文件 + dependencies + assets + docs + tools），SOURCE.md 已写；冒烟：smoke_test.py 离线回归通过（offline_runtime_checks_passed，合成夹具 13.43 秒 960x540 film.mp4，visual_acceptance_claimed=false，仅为运行时回归，非成品验收）
