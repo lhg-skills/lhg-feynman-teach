@@ -40,6 +40,16 @@ def probe(video: Path):
     d = json.loads(out)
     return float(d["format"]["duration"]), {s["codec_type"] for s in d.get("streams", [])}
 
+def gray_thumb(src: Path, t: float = 0.0) -> bytes:
+    args = ["ffmpeg", "-v", "error"] + (["-ss", f"{t:.2f}"] if t else []) + ["-i", str(src), "-frames:v", "1",
+            "-vf", "scale=64:36,format=gray", "-f", "rawvideo", "-"]
+    return subprocess.run(args, capture_output=True, check=True).stdout
+
+def probe_full(video: Path):
+    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_type,width,height:stream_disposition=attached_pic",
+                          "-of", "json", str(video)], capture_output=True, text=True, check=True).stdout
+    return json.loads(out)
+
 def frame_luma(video: Path, t: float) -> float:
     raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1",
                           "-vf", "scale=64:-1,format=gray", "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
@@ -60,7 +70,9 @@ def main():
 
     need = ["FEYNMAN.md", "video/script.md"] if a.video_only else \
         ["MISSION.md", "RESOURCES.md", "FEYNMAN.md", "GAP-LOG.md", "GATE.md", "video/script.md", "video/storyboard.md"]
-    need += ["video/TODO-待剪辑.md"] if a.level == "A" else ["video/video.mp4", "video/subtitles.srt"]
+    need += ["video/TODO-待剪辑.md"] if a.level == "A" else \
+        ["video/video.mp4", "video/video-vertical.mp4", "video/cover.png", "video/cover-vertical.png",
+         "video/finalize.json", "video/subtitles.srt"]
     missing = [p for p in need if not (w / p).is_file() or (w / p).stat().st_size == 0]
     check("文件齐全", not missing, "缺：" + "、".join(missing) if missing else f"{len(need)} 个文件")
 
@@ -90,15 +102,43 @@ def main():
         overlaps = [i for i in range(1, len(cues)) if cues[i][0] < cues[i - 1][1] - 0.01]
         check("字幕不重叠", not overlaps, f"重叠条目：{overlaps[:5]}" if overlaps else "同一时刻只有一份")
 
+    fin = w / "video/finalize.json"
+    cover_s = json.loads(fin.read_text(encoding="utf-8")).get("cover_seconds", 0) if fin.is_file() else 0
+    if a.level != "A" and srt.is_file() and fin.is_file():
+        cues = srt_cues(srt)
+        check("字幕已对齐封面", bool(cues) and cues[0][0] >= cover_s - 0.01, f"首条字幕 {cues[0][0]:.2f} 秒，封面 {cover_s} 秒" if cues else "无字幕")
+
     video = w / "video/video.mp4"
     if a.level != "A" and video.is_file():
         if not shutil.which("ffprobe"):
             check("成片可检查", False, "缺 ffprobe")
         else:
             dur, kinds = probe(video)
-            ok = abs(dur - a.target) <= a.target * a.tolerance
-            check("时长", ok, f"{dur:.2f} 秒，目标 {a.target:.0f}±{a.target * a.tolerance:.1f}")
+            body = dur - cover_s
+            ok = abs(body - a.target) <= a.target * a.tolerance
+            check("时长", ok, f"正片 {body:.2f} 秒（另有封面 {cover_s} 秒），目标 {a.target:.0f}±{a.target * a.tolerance:.1f}")
+            for name, vid, cov, size in [("横屏", video, w / "video/cover.png", None),
+                                         ("竖屏", w / "video/video-vertical.mp4", w / "video/cover-vertical.png", (1080, 1920))]:
+                if not (vid.is_file() and cov.is_file()):
+                    continue
+                info = probe_full(vid)
+                vs = [x for x in info["streams"] if x["codec_type"] == "video"]
+                main = next((x for x in vs if not x.get("disposition", {}).get("attached_pic")), vs[0])
+                if size:
+                    vd = float(info["format"]["duration"])
+                    check("竖屏 9:16", (main["width"], main["height"]) == size and abs(vd - dur) < 0.3,
+                          f"{main['width']}×{main['height']}，{vd:.2f} 秒（横屏 {dur:.2f} 秒）")
+                check(f"{name}内嵌封面", any(x.get("disposition", {}).get("attached_pic") for x in vs), "attached_pic")
+                f0, c0 = gray_thumb(vid), gray_thumb(cov)
+                diff = sum(abs(x - y) for x, y in zip(f0, c0)) / max(len(f0), 1)
+                check(f"{name}首帧=封面", diff < 12, f"首帧与封面平均差 {diff:.1f}（<12 为同一张）")
             check("音画俱全", {"audio", "video"} <= kinds, "、".join(sorted(kinds)))
+            if "audio" in kinds:
+                log = subprocess.run(["ffmpeg", "-v", "info", "-i", str(video), "-map", "0:a:0", "-af", "volumedetect", "-f", "null", "-"],
+                                     capture_output=True, text=True).stderr
+                m = re.search(r"mean_volume:\s*(-?[\d.]+) dB", log)
+                vol = float(m.group(1)) if m else -91.0
+                check("有配音（不是静音）", vol > -50, f"平均音量 {vol:.1f} dB")
             lumas = [round(frame_luma(video, dur * p), 1) for p in (0.2, 0.5, 0.8)]
             check("非黑屏", all(l > 8 for l in lumas), f"抽帧亮度 {lumas}")
 

@@ -41,6 +41,7 @@
 | 只给了讲稿和分镜，没有视频 | 宿主没有 `ffmpeg` / TTS（降到讲稿档） | 装 `ffmpeg` 与中文 TTS 后重跑第 6 步 |
 | 手绘模式报错或退化成幻灯片 | 只复制了 `SKILL.md`，缺 `vendor/`；或缺 scipy / 手写字体 | 按话术“保留完整目录和依赖”重装；`pip install -r` 上游 requirements |
 | 画面里的中文是方块 | 缺 CJK 字体 | 安装 Noto Sans CJK 等中文字体 |
+| 自检报“有配音”失败 | 没有 TTS，渲染出的是静音片 | 接入中文 TTS 或自己录旁白，存成整篇音频后重跑；或按 A 档交付 |
 | 装到旧版本 | Gitee 镜像未同步 | 让 Agent 报版本号，与 GitHub `manifest.yaml` 对比 |
 
 ## 卸载

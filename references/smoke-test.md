@@ -19,7 +19,7 @@
 在仓库根目录运行 `bash examples/ai-learn-30s/run.sh`（字体环境变量见 `examples/ai-learn-30s/README.md`）：
 
 1. 脚本退出码为 0，生成成片（时长约 30 秒）。
-2. 接着运行 `bash examples/ai-learn-30s/check.sh`，`check_delivery.py --video-only` 输出 `passed`（讲稿=旁白、字幕=旁白、字幕不重叠、时长、音画、非黑屏）。
+2. 接着运行 `bash examples/ai-learn-30s/check.sh`：先用 `finalize_video.py` 加封面、出竖屏，再用 `check_delivery.py --video-only` 检查，输出 `passed`（含横竖首帧 = 封面、竖屏 1080×1920、有配音）。
 
 ## 用例 F-3：上游 vendor 健康
 
@@ -36,6 +36,14 @@
 2. 交付待剪辑包（讲稿 + 分镜 + 带停顿标记的旁白 + `video/TODO-待剪辑.md`），**不出现“视频已生成”字样**。
 3. `check_delivery.py --level A` 输出 `passed`；若误按 B 档检查，脚本报“缺 ffprobe”并以 `failed` 退出。
 
+## 用例 F-5：幻灯片管线（能力一般的 agent 也能走通）
+
+用 `references/fixtures/sky-blue-1min/` 复制出工作区，按 `FEYNMAN.md` 每句写一条 `video/slides.json`：
+
+1. `python3 scripts/make_slides_video.py <工作区>` 生成 `body.mp4` + `body.srt`，时长约 60 秒。
+2. `python3 scripts/finalize_video.py <工作区> --title1 "天为什么是蓝的" --title2 "空气把蓝光弹得最多"` 生成横竖两版与封面。
+3. `check_delivery.py --target 60`：有旁白音频时 `passed`；没有音频时只有“有配音”一项失败（证明静音片不能冒充成片）。
+
 ## 通过标准
 
-- F-1、F-3、F-4 必过；F-2 在具备 B 档能力的环境必过，无能力时记“未运行 + 原因”。缺任一项即冒烟失败。
+- F-1、F-3、F-4、F-5 必过；F-2 在具备 B 档能力的环境必过，无能力时记“未运行 + 原因”。缺任一项即冒烟失败。
