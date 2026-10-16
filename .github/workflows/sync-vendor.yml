@@ -1,7 +1,7 @@
 name: Sync vendored upstreams
 
 # 每周一 09:00（北京时间）同步两个上游到 vendor/：
-#   - threerocks/sweety-handdraw-video（手绘引擎，整仓）
+#   - threerocks/sweety-handdraw-video（手绘引擎，运行所需部分）
 #   - mattpocock/skills 的 skills/productivity/teach（教学底座，附仓库根 LICENSE）
 # 检查全部通过才直接提交到 main：sweety 自检 + 单元测试 + smoke_test、teach 结构检查、
 # 本仓库样片 examples/ai-learn-30s 完整回归。任一失败不提交，开 issue。
@@ -63,7 +63,11 @@ jobs:
           if [ "$SW" != "$SW_CUR" ]; then
             CHANGED=true; git -C /tmp/up-sweety checkout --quiet "$SW"
             mkdir -p vendor/sweety-handdraw-video
-            rsync -a --delete --exclude '.git/' --exclude '.github/' --exclude '.upstream-commit' /tmp/up-sweety/ vendor/sweety-handdraw-video/
+            # 只排除仓库根的 .git/.github（依赖包内的 .github 是校验清单的一部分）；两个参考资料包运行时不引用，不收录
+            rsync -a --delete --delete-excluded --exclude '/.git/' --exclude '/.github/' --exclude '.upstream-commit' \
+              --exclude '/skills/sweety-handdraw-video/dependencies/huashu-art-motion/' \
+              --exclude '/skills/sweety-handdraw-video/dependencies/omniailab-ai-director/' \
+              /tmp/up-sweety/ vendor/sweety-handdraw-video/
             echo "$SW" > vendor/sweety-handdraw-video/.upstream-commit
           fi
           if [ "$TE" != "$TE_CUR" ]; then
@@ -92,7 +96,9 @@ jobs:
         run: |
           set -euo pipefail
           S=vendor/sweety-handdraw-video/skills/sweety-handdraw-video/scripts
-          python "$S/validate_package.py"
+          # validate_package 需要上游全部依赖，在上游完整副本上跑；精简后的 vendor 跑单测和冒烟
+          git -C /tmp/up-sweety checkout --quiet "${{ steps.sync.outputs.sweety }}"
+          python /tmp/up-sweety/skills/sweety-handdraw-video/scripts/validate_package.py
           python -m unittest discover -s "$S" -p 'test*.py'
           python "$S/smoke_test.py" --output /tmp/sweety-smoke | tee /tmp/smoke.log
           grep -q 'offline_runtime_checks_passed' /tmp/smoke.log
@@ -113,7 +119,9 @@ jobs:
           HW_FONT: /tmp/fonts/MaShanZheng-Regular.ttf
           SC_FONT: /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
           SC_INDEX: '2'
-        run: bash examples/ai-learn-30s/run.sh
+        run: |
+          bash examples/ai-learn-30s/run.sh
+          bash examples/ai-learn-30s/check.sh
 
       - name: Commit to main (all checks passed)
         if: steps.sync.outputs.changed == 'true'

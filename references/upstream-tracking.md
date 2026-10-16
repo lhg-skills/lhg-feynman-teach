@@ -15,7 +15,7 @@
 - 作者 X：@leo_xiaolei（水族店刘老板），帖子：https://x.com/leo_xiaolei/status/2110404124970045858
 - 本 skill 吸纳时核验的版本：`1.2.3`，commit `5206ec0d17f9b353e400b64b9c51ad69e721e02a`，核验时间 2026-10-15
 - 核验时快照：387→411 stars（页面与 API 在同一天内有波动，以 API 为准）、约 82→89 forks、公开仓、MIT
-- 吸纳方式：完整源码原样收录到 `vendor/sweety-handdraw-video/`（保留上游 LICENSE / THIRD_PARTY_NOTICES，不手改）；当前版本见 `vendor/sweety-handdraw-video.pin` 与 `vendor/UPSTREAM.md`
+- 吸纳方式：运行所需部分原样收录到 `vendor/sweety-handdraw-video/`（不含两个大型参考资料包 `huashu-art-motion`、`omniailab-ai-director`，同步时用上游完整副本校验）（保留上游 LICENSE / THIRD_PARTY_NOTICES，不手改）；当前版本见 `vendor/sweety-handdraw-video.pin` 与 `vendor/UPSTREAM.md`
 - 吸纳点：声音先行、绘制计划、分部位描线、先轮廓后填色、字幕唯一性、代表段检查
 
 ## 跟踪规则

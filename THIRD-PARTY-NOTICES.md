@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-本仓库 `vendor/` 目录原样收录以下第三方开源项目（不手改，每周由 `.github/workflows/sync-vendor.yml` 同步上游，锁定版本见对应 `.pin` 文件）。各自许可证随源码保留。
+本仓库 `vendor/` 目录原样收录以下第三方开源项目（sweety 只收运行所需部分，不含其 `dependencies/huashu-art-motion`、`dependencies/omniailab-ai-director` 两个参考资料包）（不手改，每周由 `.github/workflows/sync-vendor.yml` 同步上游，锁定版本见对应 `.pin` 文件）。各自许可证随源码保留。
 
 | 目录 | 上游 | 许可证 | 版权 |
 |---|---|---|---|
