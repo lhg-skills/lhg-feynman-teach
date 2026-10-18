@@ -29,6 +29,21 @@ jobs:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
           REPO="${GITHUB_REPOSITORY#*/}"
+          API="https://gitee.com/api/v5"
+          AUTH="access_token=${GITEE_TOKEN}"
+          # Gitee 仓库不存在时自动创建（组织仓库），避免 push 报 404
+          if ! curl -fsS -o /dev/null "${API}/repos/lhg-skills/${REPO}?${AUTH}"; then
+            echo "Gitee 仓库 lhg-skills/${REPO} 不存在，尝试自动创建…"
+            curl -sS -o /dev/null -X POST "${API}/orgs/lhg-skills/repos?${AUTH}" \
+              --data-urlencode "name=${REPO}" \
+              --data-urlencode "description=GitHub 镜像同步" \
+              -d "private=false" -d "has_issues=false" -d "has_wiki=false" || true
+            if ! curl -fsS -o /dev/null "${API}/repos/lhg-skills/${REPO}?${AUTH}"; then
+              echo "::error::Gitee 仓库创建失败。请在 Gitee 网页手动新建 lhg-skills/${REPO}，或检查 GITEE_TOKEN 是否有 projects 权限，然后重跑 workflow。"
+              exit 1
+            fi
+            echo "Gitee 仓库已创建"
+          fi
           REMOTE="https://${GITEE_USER}:${GITEE_TOKEN}@gitee.com/lhg-skills/${REPO}.git"
           git push --force "$REMOTE" HEAD:main
           git push --force --tags "$REMOTE"
